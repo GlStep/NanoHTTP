@@ -1,0 +1,7 @@
+# Based on Google style with 4-space indentation
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+AccessModifierOffset: -4
+ColumnLimit: 100
