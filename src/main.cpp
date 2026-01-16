@@ -34,6 +34,28 @@ void cleanupSockets() {
 #endif
 }
 
+void handleClient(socket_t clientSocket) {
+    char buffer[4096];
+    int bytesReceived = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+
+    if (bytesReceived > 0) {
+        buffer[bytesReceived] = '\0';
+        std::cout << "Received: " << buffer << std::endl;
+
+        std::string body = "<html><body><h1>Hello, World!</h1></body></html>";
+        std::string httpResponse =
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/html\r\n"
+            "Content-Length: " +
+            std::to_string(body.size()) +
+            "\r\n"
+            "Connection: close\r\n"
+            "\r\n" +
+            body;
+        send(clientSocket, httpResponse.c_str(), httpResponse.size(), 0);
+    }
+}
+
 int main() {
     std::cout << "Hello, World!" << std::endl;
     if (!initializeSockets()) {
@@ -74,7 +96,22 @@ int main() {
     }
 
     std::cout << "Server is listening on port 8080: http://localhost:8080" << std::endl;
-    // TODO: Implement loop
+
+    while (true) {
+        sockaddr_in clientAddr{};
+        socklen_t clientLen = sizeof(clientAddr);
+        socket_t clientSocket = accept(serverSocket, (sockaddr*)&clientAddr, &clientLen);
+        if (clientSocket == INVALID_SOCKET) {
+            std::cerr << "Accept failed." << std::endl;
+            break;
+        }
+
+        std::cout << "Client connected." << std::endl;
+
+        // TODO: Handle client communication
+        handleClient(clientSocket);
+        CLOSE_SOCKET(clientSocket);
+    }
 
     cleanupSockets();
 
