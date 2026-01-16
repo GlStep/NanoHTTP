@@ -113,6 +113,7 @@ int main() {
         CLOSE_SOCKET(clientSocket);
     }
 
+    CLOSE_SOCKET(serverSocket);
     cleanupSockets();
 
     return 0;
